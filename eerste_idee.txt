@@ -1,0 +1,14 @@
+Multiband Matching Equalizer
+
+Concept:
+EQ die een geluid (source) spectraal analyseert en een ander geluid (target) zodanig EQ’d dat het hetzelfde frequentiespectrum heeft
+
+Functies:
+FFT analyse van geluidsbestanden
+linear phase eq
+geluid in variable banden opsplitsen
+amount en smoothness per band instelbaar
+
+Aannames:
+database van snapshots aanmaken
+geen real-time EQing
