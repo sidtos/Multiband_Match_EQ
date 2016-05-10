@@ -1,0 +1,21 @@
+Logbook
+———
+
+FFT Spectrum
+average
+fill two-dimensional vector
+calculate average per column/band
+send average to GUI
+start / stop button
+fix spectrum
+read last row of 2d vector
+draw fixed spectrum
+2nd spectrum
+draw new spectrum
+reset 2d vector
+calculate average per column/band
+calculate matched curve
+compare both vectors
+draw matched curve
+draw margin
+scale amount
