@@ -119,26 +119,32 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
     // send fft data for spectrum display
     const double sr = this->GetSampleRate();
     
-    for (int c = 0; c < fftSize / 2 + 1; c++) {
-      gFFTlyzer->SendFFT(sFFT->GetOutput(c), c, sr);
-      
-      if (c == fftSize / 2) {
-        // add empty row
-        matrix.push_back(std::vector<double>(2049, 0.));
-        for (int x = 0; x < matrix[row].size(); x++) {
-          //std::cout << "Row: " << row + 1 << "Coll " << x + 1 << "Value " << matrix[row][x] << std::endl;
-          sum = 0.;
-          for (int y = 0; y < row + 1; y++) {
-            sum += matrix[y][x];
-            averageVector[x] = sum / (row + 1);
+    if (mSwitch) {
+      //std::cout << "check";
+      for (int c = 0; c < fftSize / 2 + 1; c++) {
+        gFFTlyzer->SendFFT(averageVector[c], c, sr);
+        
+        if (c == fftSize / 2) {
+          // add empty row
+          matrix.push_back(std::vector<double>(2049, 0.));
+          for (int x = 0; x < matrix[row].size(); x++) {
+            //std::cout << "Row: " << row + 1 << "Coll " << x + 1 << "Value " << matrix[row][x] << std::endl;
+            sum = 0.;
+            for (int y = 0; y < row + 1; y++) {
+              sum += matrix[y][x];
+              averageVector[x] = sum / (row + 1);
+            }
           }
+          row++;
+        } else {
+          matrix[row][c] = sFFT->GetOutput(c);
         }
-        row++;
-        std::cout << averageVector[500] << std::endl;
-      } else {
-        matrix[row][c] = sFFT->GetOutput(c);
       }
-      
+    } else {
+      for (int c = 0; c < fftSize / 2 + 1; c++) {
+        gFFTlyzer->SendFFT(sFFT->GetOutput(c), c, sr);
+      }
+      row = 0.;
     }
   }
 }
