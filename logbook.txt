@@ -1,12 +1,12 @@
 Logbook
 ———
 
-FFT Spectrum
-average
-fill two-dimensional vector
-calculate average per column/band
-send average to GUI
-start / stop button
+x FFT Spectrum
+x average
+x fill two-dimensional vector
+x calculate average per column/band
+x send average to GUI
+x start / stop button
 fix spectrum
 read last row of 2d vector
 draw fixed spectrum

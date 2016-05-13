@@ -6,7 +6,8 @@
 
 const int kNumPrograms = 1;
 
-std::vector<std::vector<double> > matrix(1, std::vector<double>(2049, 0.));
+// matrix 250 x 2049
+std::vector<std::vector<double> > matrix(500, std::vector<double>(2049, 0.));
 std::vector<double> averageVector(2049, 0.);
 
 enum EParams
@@ -106,37 +107,37 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
     sFFT->SendInput(audioAverage);
   }
   
-  //Backup
-  /*if (GetGUI()) {
-    // send fft data for spectrum display
-    const double sr = this->GetSampleRate();
-    for (int c = 0; c < fftSize / 2 + 1; c++) {
-      gFFTlyzer->SendFFT(sFFT->GetOutput(c), c, sr);
-    }
-  }*/
-  
   if (GetGUI()) {
     // send fft data for spectrum display
     const double sr = this->GetSampleRate();
-    int averageLimit = 250;
-    
+    // start / stop freeze
     if (mSwitch) {
-      //std::cout << "check";
+      // for every column
       for (int c = 0; c < fftSize / 2 + 1; c++) {
+        // draw average value
         gFFTlyzer->SendFFT(averageVector[c], c, sr);
-        
+        // at the end of the row
         if (c == fftSize / 2) {
-          // add empty row
-          matrix.push_back(std::vector<double>(2049, 0.));
+          // for every column
           for (int x = 0; x < matrix[row].size(); x++) {
+            // reset
             sum = 0.;
-            for (int y = 0; y < row + 1; y++) {
+            // for every row
+            for (int y = 0; y < denominator + 1; y++) {
+              // sum all values of the recent column
               sum += matrix[y][x];
-              averageVector[x] = sum / double(row + 1);
+              // store average per column in vector
+              averageVector[x] = sum / double(denominator + 1);
             }
           }
-          std::cout << row << std::endl;
-          row++;
+          if (row < (maxSize - 1)) {
+            row++;
+          } else {
+            row = 0;
+          }
+          if (denominator < (maxSize - 1)) {
+            denominator++;
+          }
         } else {
           matrix[row][c] = sFFT->GetOutput(c);
         }
@@ -145,10 +146,9 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
       for (int c = 0; c < fftSize / 2 + 1; c++) {
         gFFTlyzer->SendFFT(sFFT->GetOutput(c), c, sr);
       }
-      // resets
-      row = 0.;
-      matrix.resize(1);
-      std::fill(matrix[0].begin(), matrix[0].end(), 0.);
+      // reset
+      row = 0;
+      denominator = 0.;
     }
   }
 }
