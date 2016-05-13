@@ -118,6 +118,7 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
   if (GetGUI()) {
     // send fft data for spectrum display
     const double sr = this->GetSampleRate();
+    int averageLimit = 250;
     
     if (mSwitch) {
       //std::cout << "check";
@@ -128,13 +129,13 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
           // add empty row
           matrix.push_back(std::vector<double>(2049, 0.));
           for (int x = 0; x < matrix[row].size(); x++) {
-            //std::cout << "Row: " << row + 1 << "Coll " << x + 1 << "Value " << matrix[row][x] << std::endl;
             sum = 0.;
             for (int y = 0; y < row + 1; y++) {
               sum += matrix[y][x];
-              averageVector[x] = sum / (row + 1);
+              averageVector[x] = sum / double(row + 1);
             }
           }
+          std::cout << row << std::endl;
           row++;
         } else {
           matrix[row][c] = sFFT->GetOutput(c);
@@ -144,7 +145,10 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
       for (int c = 0; c < fftSize / 2 + 1; c++) {
         gFFTlyzer->SendFFT(sFFT->GetOutput(c), c, sr);
       }
+      // resets
       row = 0.;
+      matrix.resize(1);
+      std::fill(matrix[0].begin(), matrix[0].end(), 0.);
     }
   }
 }
