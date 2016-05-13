@@ -7,13 +7,14 @@
 const int kNumPrograms = 1;
 
 // matrix 250 x 2049
-std::vector<std::vector<double> > matrix(500, std::vector<double>(2049, 0.));
+std::vector<std::vector<double> > matrix(250, std::vector<double>(2049, 0.));
 std::vector<double> averageVector(2049, 0.);
 
 enum EParams
 {
   kGain = 0,
   kISwitchControl_2,
+  kISwitchControl_2b,
   kNumParams
 };
 
@@ -27,6 +28,9 @@ enum ELayout
   kISwitchControl_2_X = 20,
   kISwitchControl_2_Y = 80,
   kISwitchControl_2_N = 2,
+  kISwitchControl_2b_X = 20,
+  kISwitchControl_2b_Y = 150,
+  kISwitchControl_2b_N = 2,
   kKnobFrames = 60
 };
 
@@ -39,6 +43,8 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   GetParam(kGain)->InitDouble("Gain", 0., -24., 24., 0.01, "dB");
   GetParam(kGain)->SetShape(2.);
   GetParam(kISwitchControl_2)->InitBool("ISwitchControl 2 image multi", 0, "images");
+  GetParam(kISwitchControl_2b)->InitBool("ISwitchControl 2 image multi", 0, "images");
+
   
   IGraphics* pGraphics = MakeGraphics(this, kWidth, kHeight);
   pGraphics->AttachPanelBackground(&COLOR_WHITE);
@@ -48,6 +54,7 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   
   pGraphics->AttachControl(new IKnobMultiControl(this, kGainX, kGainY, kGain, &knob));
   pGraphics->AttachControl(new ISwitchControl(this, kISwitchControl_2_X, kISwitchControl_2_Y, kISwitchControl_2, &bitmap));
+  pGraphics->AttachControl(new ISwitchControl(this, kISwitchControl_2b_X, kISwitchControl_2b_Y, kISwitchControl_2b, &bitmap));
   
   // IRECT for graphical display
   IRECT iView(80, 20, 80 + 510, 20 + 560);
@@ -55,7 +62,7 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   gFFTlyzer = new gFFTAnalyzer(this, iView, COLOR_GRAY, -1, fftSize, false);
   pGraphics->AttachControl(gFFTlyzer);
   gFFTlyzer->SetdbFloor(-60.);
-  gFFTlyzer->SetColors(COLOR_GRAY, COLOR_BLACK);
+  gFFTlyzer->SetColors(COLOR_GRAY, COLOR_BLUE);
   
 #ifdef OS_OSX
   char* fontName = "Futura";
@@ -171,6 +178,10 @@ void MultibandMatchEQ::OnParamChange(int paramIdx)
       
     case kISwitchControl_2:
       mSwitch = GetParam(kISwitchControl_2)->Bool();
+      break;
+      
+    case kISwitchControl_2b:
+      mSwitchb = GetParam(kISwitchControl_2b)->Bool();
       break;
       
     default:
