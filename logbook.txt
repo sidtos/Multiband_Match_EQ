@@ -7,15 +7,16 @@ x fill two-dimensional vector
 x calculate average per column/band
 x send average to GUI
 x start / stop button
-fix spectrum
-read last row of 2d vector
-draw fixed spectrum
-2nd spectrum
-draw new spectrum
-reset 2d vector
-calculate average per column/band
-calculate matched curve
-compare both vectors
-draw matched curve
-draw margin
-scale amount
+x fix spectrum
+x read last row of 2d vector
+x draw fixed spectrum
+x 2nd spectrum
+x draw new spectrum
+x reset 2d vector
+x calculate average per column/band
+x calculate matched curve
+x compare both vectors
+x draw matched curve
+x draw margin
+x scale amount
+de-octave-gain
