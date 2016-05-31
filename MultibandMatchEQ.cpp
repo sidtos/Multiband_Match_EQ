@@ -111,9 +111,9 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   gFFTFreqLines->SetMinFreq(minF);
   
   //setting +3dB/octave compensation to the fft display
-  gFFTlyzer->SetOctaveGain(0., true);
-  sourceSpectrum->SetOctaveGain(0., true);
-  targetSpectrum->SetOctaveGain(0., true);
+  gFFTlyzer->SetOctaveGain(3., true);
+  sourceSpectrum->SetOctaveGain(3., true);
+  targetSpectrum->SetOctaveGain(3., true);
   matchingCurve->SetOctaveGain(0., true);
   
   AttachGraphics(pGraphics);
@@ -135,16 +135,51 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
   double* out1 = outputs[0];
   double* out2 = outputs[1];
   
-  filterOutL = filterOutR = 0.0;
-  mBandPass.calculateCoefficients(23., 100.);
+  filter25L = filter25R = 0.0;
+  bandPass25.calculateCoefficients(1.8, 25.);
+  filter50L = filter50R = 0.0;
+  bandPass50.calculateCoefficients(1.8, 50.);
+  filter100L = filter100R = 0.0;
+  bandPass100.calculateCoefficients(1.8, 100.);
+  filter200L = filter200R = 0.0;
+  bandPass200.calculateCoefficients(1.8, 200.);
+  filter400L = filter400R = 0.0;
+  bandPass400.calculateCoefficients(1.8, 400.);
+  filter800L = filter800R = 0.0;
+  bandPass800.calculateCoefficients(1.8, 800.);
+  filter1600L = filter1600R = 0.0;
+  bandPass1600.calculateCoefficients(1.8, 1600.);
+  filter3200L = filter3200R = 0.0;
+  bandPass3200.calculateCoefficients(1.8, 3200.);
+  filter6400L = filter6400R = 0.0;
+  bandPass6400.calculateCoefficients(1.8, 6400.);
+  filter12800L = filter12800R = 0.0;
+  bandPass12800.calculateCoefficients(1.8, 12800.);
   
   for (int s = 0; s < nFrames; ++s, ++in1, ++in2, ++out1, ++out2) {
-    //*out1 = *in1 * mGain;
-    //*out2 = *in2 * mGain;
+    /* *out1 = *in1 * mGain;
+    *out2 = *in2 * mGain;*/
     
-    mBandPass.processSamples(*in1, *in2, filterOutL, filterOutR);
+    bandPass25.processSamples(*in1, *in2, filter25L, filter25R);
+    bandPass50.processSamples(*in1, *in2, filter50L, filter50R);
+    bandPass100.processSamples(*in1, *in2, filter100L, filter100R);
+    bandPass200.processSamples(*in1, *in2, filter200L, filter200R);
+    bandPass400.processSamples(*in1, *in2, filter400L, filter400R);
+    bandPass800.processSamples(*in1, *in2, filter800L, filter800R);
+    bandPass1600.processSamples(*in1, *in2, filter1600L, filter1600R);
+    bandPass3200.processSamples(*in1, *in2, filter3200L, filter3200R);
+    bandPass6400.processSamples(*in1, *in2, filter6400L, filter6400R);
+    bandPass12800.processSamples(*in1, *in2, filter12800L, filter12800R);
+    
+    filterbankOutputL = mGain * (filter25L + filter50L  + filter100L + filter200L + filter400L + filter800L + filter1600L + filter3200L + filter6400L + filter12800L);
+    filterbankOutputR = mGain * (filter25R + filter50R  + filter100R + filter200R + filter400R + filter800R + filter1600R + filter3200R + filter6400R + filter12800R);
+    
+    *out1 = filterbankOutputL;
+    *out2 = filterbankOutputR;
+    
     //send average to FFT class
-    audioAverage = (filterOutL * mGain + filterOutR * mGain) * 0.5;
+    audioAverage = (filterbankOutputL + filterbankOutputR) * 0.5;
+    //audioAverage = (*out1 + *out2) * 0.5;
     sFFT->SendInput(audioAverage);
   }
   
@@ -257,7 +292,16 @@ void MultibandMatchEQ::Reset()
 {
   TRACE;
   IMutexLock lock(this);
-  mBandPass.initialize();
+  bandPass25.initialize();
+  bandPass50.initialize();
+  bandPass100.initialize();
+  bandPass200.initialize();
+  bandPass400.initialize();
+  bandPass800.initialize();
+  bandPass1600.initialize();
+  bandPass3200.initialize();
+  bandPass6400.initialize();
+  bandPass12800.initialize();
 }
 
 void MultibandMatchEQ::OnParamChange(int paramIdx)

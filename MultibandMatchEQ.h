@@ -37,9 +37,29 @@ private:
   int maxSize = 250;
   double denominator = 0.;
   double deOctGained = 0.;
+  double filterbankOutputL = 0.;
+  double filterbankOutputR = 0.;
   
-  Bandpass mBandPass;
-  double filterOutR, filterOutL;
+  Bandpass bandPass25;
+  double filter25R, filter25L;
+  Bandpass bandPass50;
+  double filter50R, filter50L;
+  Bandpass bandPass100;
+  double filter100R, filter100L;
+  Bandpass bandPass200;
+  double filter200R, filter200L;
+  Bandpass bandPass400;
+  double filter400R, filter400L;
+  Bandpass bandPass800;
+  double filter800R, filter800L;
+  Bandpass bandPass1600;
+  double filter1600R, filter1600L;
+  Bandpass bandPass3200;
+  double filter3200R, filter3200L;
+  Bandpass bandPass6400;
+  double filter6400R, filter6400L;
+  Bandpass bandPass12800;
+  double filter12800R, filter12800L;
 };
 
 #endif
