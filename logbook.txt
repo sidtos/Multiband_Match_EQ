@@ -74,3 +74,6 @@ filterbank using white noise a subtle comb filter effect can be heard.
 The next step would be to calculate the average volume of the matching curve for each
 bandpass. Then, to get rid of the comb filter effect, each filter should be created
 dynamically in order to use an unlimited amount of filters.
+
+Problem: the vector of the matching curve is filled with 2049 values. However, as 
+frequencies are represented logarithmically, 2049 can't be divided by 10.
