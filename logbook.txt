@@ -82,3 +82,19 @@ Notes:
 Frequencies: 22050
 Vectorsize: 2049
 Number of bands: 10
+
+---
+
+04.06.2016
+
+The minim library for Processing provides an example where the FFT averages are
+calculated, both linearly and logarithmically. On github I found the source code
+(https://github.com/ddf/Minim/blob/master/src/ddf/minim/analysis/FourierTransform.java)
+of their FFT class. After implementing these functions I am able to calculate the
+corresponding index of each frequency. Furthermore, I now split the FFT in 10 octaves,
+each divided by 3, resulting in a total of 30 bands.
+
+Next step: 
+- link a bandpass filter to the centerfrequency of each band
+- calculate the bandwith of the filter using the precalculated values for the low and the
+  high frequencies
