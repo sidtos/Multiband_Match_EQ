@@ -1,0 +1,100 @@
+#Logbook
+———
+
+##21.05.2016
+
+The development of the plugin can be divided in two parts: FFT calculations and filtering. 
+I chose to begin with the spectral half. The following components are implemented and seem 
+to work:
+
+A visual representation of the frequency spectrum, including:
+	the possibility to calculate the average of each frequency band, which is achieved by:
+		filling a two-dimensional vector
+		calculating the average per column
+		sending the average to the GUI
+A start/stop button to fix the spectrum, by:
+	reading the last row of the 2d vector
+	drawing the fixed spectrum
+A 2nd spectrum, that:
+	draws a new spectrum
+	resets the 2d vector
+	calculates the average per column
+	calculates matched curve, by: 
+		subtracting both spectrums 
+		adding a specific offset
+	sends the matched curve to the GUI
+A slider to scale the amount of the matched curve
+
+When trying to draw the matched curve I came across the following problem:
+In order to visualize the frequency spectrum in a proper manner, 3dB of octave gain are 
+applied. Because the human ear perceives high frequencies to be louder than they really are, 
+the spectrum adds 3dB of gain per octave. This ensures that the spectrum looks like the way 
+we think to hear it. However, when a horizontal line should be drawn, the octave gain causes 
+it to appear diagonally.
+
+A possible solution:
+De-activate the octavegain for the matched curve and multiply the vector by another vector 
+filled with (for example) y=x^2+1. This must happen before adding the offset.
+
+Note:
+If there's time left at the end of the project I will implement the solution. However, 
+creating the filter has a higher priority for now.
+
+---
+
+##23.05.2016
+
+After explaining my project to Pieter Suurmond I decided to design a x-band filterbank of 
+several bandpass filters. Pieter stated that in "Elements of Computer Music" (page 134) by 
+Richard Moore, a formula can be found to calculate the filter coefficients and at the same 
+time obtain the same bandwidth for every frequency. However, the values I get (for the 
+variable R) are not as expected.
+
+In "Writing difference equations for digital filters" by Brian T. Boulter 
+(http://www.apicsllc.com/apics/Sr_3/Sr_3.htm) a method is presented to map a butterworth 
+low pass filter to a bandpass filter. Yet again I get strange values (for the variable c).
+
+To check if my calculations are correct I use the "Biquad calculator v2" 
+(http://www.earlevel.com/main/2013/10/13/biquad-calculator-v2/) by Nigel Redmond. Luckily, 
+he provides the source code for his web application which helped me alot to calculate the 
+correct coefficients. I implemented a first filter in my program and it seems to work.
+
+The next step would be to split the spectrum in a number of bands (possibly as stated in 
+http://stackoverflow.com/questions/10349597/2nd-order-iir-filter-coefficients-for-a-butterworth-bandpass-eq)
+and create a bandpass filter for each band.
+
+---
+
+##30.05.2016
+
+Several bandpass filters were implemented. Starting at 25 Hz I took twice the value for
+the next bandpass resulting in a total of 10 filters. When testing the response of the
+filterbank using white noise a subtle comb filter effect can be heard. 
+
+The next step would be to calculate the average volume of the matching curve for each
+bandpass. Then, to get rid of the comb filter effect, each filter should be created
+dynamically in order to use an unlimited amount of filters.
+
+Problem: the vector of the matching curve is filled with 2049 values. However, as 
+frequencies are represented logarithmically, 2049 can't be divided by 10.
+
+Notes:
+Frequencies: 22050
+Vectorsize: 2049
+Number of bands: 10
+
+---
+
+##04.06.2016
+
+The minim library for Processing provides an example where the FFT averages are
+calculated, both linearly and logarithmically. On github I found the source code
+(https://github.com/ddf/Minim/blob/master/src/ddf/minim/analysis/FourierTransform.java)
+of their FFT class. After implementing these functions I am able to calculate the
+corresponding index of each frequency. Furthermore, I now split the FFT in 10 octaves,
+each divided by 3, resulting in a total of 30 bands.
+
+Next step: 
+- link a bandpass filter to the centerfrequency of each band
+- calculate the bandwith of the filter using the precalculated values for the low and the
+  high frequencies
