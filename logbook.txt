@@ -77,3 +77,8 @@ dynamically in order to use an unlimited amount of filters.
 
 Problem: the vector of the matching curve is filled with 2049 values. However, as 
 frequencies are represented logarithmically, 2049 can't be divided by 10.
+
+Notes:
+Frequencies: 22050
+Vectorsize: 2049
+Number of bands: 10

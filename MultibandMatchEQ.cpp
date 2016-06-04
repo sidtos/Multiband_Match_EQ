@@ -12,7 +12,6 @@ std::vector<double> averageVector(2049, 0.);
 std::vector<double> targetVector(2049, 0.);
 std::vector<double> matchingVector(2049, 0.);
 
-
 enum EParams
 {
   kGain = 0,
@@ -135,6 +134,21 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
   double* out1 = outputs[0];
   double* out2 = outputs[1];
   
+  LogAverages(22, 3);
+  float centerfrequency = 0.;
+  for (int i = 0; i < averages; i++) {
+    centerfrequency = GetAverageCenterFrequency(i);
+    float averageWidth = GetAverageBandWidth(i);
+    float lowFreq  = centerfrequency - averageWidth/2;
+    std::cout << "Low frequency of band " << i+1 << " in Hz: " << lowFreq << std::endl;
+    float highFreq = centerfrequency + averageWidth/2;
+    std::cout << "High frequency of band " << i+1 << " in Hz: " << highFreq << std::endl;
+    int xl = FrequencyToIndex(lowFreq);
+    std::cout << "Band " << i+1 << " low frequency index: " << xl << std::endl;
+    int xr = FrequencyToIndex(highFreq);
+    std::cout << "Band " << i+1 << " high frequency index: " << xr << std::endl;
+  }
+  
   filter25L = filter25R = 0.0;
   bandPass25.calculateCoefficients(1.8, 25.);
   filter50L = filter50R = 0.0;
@@ -157,8 +171,6 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
   bandPass12800.calculateCoefficients(1.8, 12800.);
   
   for (int s = 0; s < nFrames; ++s, ++in1, ++in2, ++out1, ++out2) {
-    /* *out1 = *in1 * mGain;
-    *out2 = *in2 * mGain;*/
     
     bandPass25.processSamples(*in1, *in2, filter25L, filter25R);
     bandPass50.processSamples(*in1, *in2, filter50L, filter50R);
