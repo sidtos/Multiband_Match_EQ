@@ -1,5 +1,4 @@
 #Logbook
-———
 
 ##21.05.2016
 
@@ -7,23 +6,23 @@ The development of the plugin can be divided in two parts: FFT calculations and 
 I chose to begin with the spectral half. The following components are implemented and seem 
 to work:
 
-A visual representation of the frequency spectrum, including:
-	the possibility to calculate the average of each frequency band, which is achieved by:
-		filling a two-dimensional vector
-		calculating the average per column
-		sending the average to the GUI
-A start/stop button to fix the spectrum, by:
-	reading the last row of the 2d vector
-	drawing the fixed spectrum
-A 2nd spectrum, that:
-	draws a new spectrum
-	resets the 2d vector
-	calculates the average per column
-	calculates matched curve, by: 
-		subtracting both spectrums 
-		adding a specific offset
-	sends the matched curve to the GUI
-A slider to scale the amount of the matched curve
+- A visual representation of the frequency spectrum, including:
+  * the possibility to calculate the average of each frequency band, which is achieved by:
+    * filling a two-dimensional vector
+    * calculating the average per column
+    * sending the average to the GUI
+- A start/stop button to fix the spectrum, by:
+  * reading the last row of the 2d vector
+  * drawing the fixed spectrum
+- A 2nd spectrum, that:
+  * draws a new spectrum
+  * resets the 2d vector
+  * calculates the average per column
+  * calculates matched curve, by: 
+    * subtracting both spectrums 
+    * adding a specific offset
+  * sends the matched curve to the GUI
+- A slider to scale the amount of the matched curve
 
 When trying to draw the matched curve I came across the following problem:
 In order to visualize the frequency spectrum in a proper manner, 3dB of octave gain are 
@@ -79,9 +78,9 @@ Problem: the vector of the matching curve is filled with 2049 values. However, a
 frequencies are represented logarithmically, 2049 can't be divided by 10.
 
 Notes:
-Frequencies: 22050
-Vectorsize: 2049
-Number of bands: 10
+- Frequencies: 22050
+- Vectorsize: 2049
+- Number of bands: 10
 
 ---
 
