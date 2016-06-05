@@ -135,62 +135,41 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
   double* out2 = outputs[1];
   
   LogAverages(22, 3);
-  float centerfrequency = 0.;
+  std::vector<Bandpass> filterBank(averages, Bandpass());
+  std::vector<std::vector<double> > outputStorage(2, std::vector<double>(averages, 0.));
   for (int i = 0; i < averages; i++) {
     centerfrequency = GetAverageCenterFrequency(i);
+    //std::cout << centerfrequency << std::endl;
     float averageWidth = GetAverageBandWidth(i);
     float lowFreq  = centerfrequency - averageWidth/2;
-    std::cout << "Low frequency of band " << i+1 << " in Hz: " << lowFreq << std::endl;
+    //std::cout << "Low frequency of band " << i+1 << " in Hz: " << lowFreq << std::endl;
     float highFreq = centerfrequency + averageWidth/2;
-    std::cout << "High frequency of band " << i+1 << " in Hz: " << highFreq << std::endl;
+    //std::cout << "High frequency of band " << i+1 << " in Hz: " << highFreq << std::endl;
+    double qValue = centerfrequency/(highFreq - lowFreq);
+    //std::cout << "Q of band " << i+1 << " is: " << highFreq << std::endl;
     int xl = FrequencyToIndex(lowFreq);
-    std::cout << "Band " << i+1 << " low frequency index: " << xl << std::endl;
+    //std::cout << "Band " << i+1 << " low frequency index: " << xl << std::endl;
     int xr = FrequencyToIndex(highFreq);
-    std::cout << "Band " << i+1 << " high frequency index: " << xr << std::endl;
+    //std::cout << "Band " << i+1 << " high frequency index: " << xr << std::endl;
+    filterBank[i] = Bandpass(qValue, centerfrequency);
+    //std::cout << "Band " << i+1 << " size: " << filterBank.size() << std::endl;
   }
   
-  filter25L = filter25R = 0.0;
-  bandPass25.calculateCoefficients(1.8, 25.);
-  filter50L = filter50R = 0.0;
-  bandPass50.calculateCoefficients(1.8, 50.);
-  filter100L = filter100R = 0.0;
-  bandPass100.calculateCoefficients(1.8, 100.);
-  filter200L = filter200R = 0.0;
-  bandPass200.calculateCoefficients(1.8, 200.);
-  filter400L = filter400R = 0.0;
-  bandPass400.calculateCoefficients(1.8, 400.);
-  filter800L = filter800R = 0.0;
-  bandPass800.calculateCoefficients(1.8, 800.);
-  filter1600L = filter1600R = 0.0;
-  bandPass1600.calculateCoefficients(1.8, 1600.);
-  filter3200L = filter3200R = 0.0;
-  bandPass3200.calculateCoefficients(1.8, 3200.);
-  filter6400L = filter6400R = 0.0;
-  bandPass6400.calculateCoefficients(1.8, 6400.);
-  filter12800L = filter12800R = 0.0;
-  bandPass12800.calculateCoefficients(1.8, 12800.);
-  
   for (int s = 0; s < nFrames; ++s, ++in1, ++in2, ++out1, ++out2) {
-    
-    bandPass25.processSamples(*in1, *in2, filter25L, filter25R);
-    bandPass50.processSamples(*in1, *in2, filter50L, filter50R);
-    bandPass100.processSamples(*in1, *in2, filter100L, filter100R);
-    bandPass200.processSamples(*in1, *in2, filter200L, filter200R);
-    bandPass400.processSamples(*in1, *in2, filter400L, filter400R);
-    bandPass800.processSamples(*in1, *in2, filter800L, filter800R);
-    bandPass1600.processSamples(*in1, *in2, filter1600L, filter1600R);
-    bandPass3200.processSamples(*in1, *in2, filter3200L, filter3200R);
-    bandPass6400.processSamples(*in1, *in2, filter6400L, filter6400R);
-    bandPass12800.processSamples(*in1, *in2, filter12800L, filter12800R);
-    
-    filterbankOutputL = mGain * (filter25L + filter50L  + filter100L + filter200L + filter400L + filter800L + filter1600L + filter3200L + filter6400L + filter12800L);
-    filterbankOutputR = mGain * (filter25R + filter50R  + filter100R + filter200R + filter400R + filter800R + filter1600R + filter3200R + filter6400R + filter12800R);
-    
+    for (int i = 0; i < averages; i++) {
+      if (i == 0) {
+        filterbankOutputL = 0.;
+        filterbankOutputR = 0.;
+      }
+      filterBank[i].processSamples(*in1, *in2, outputStorage[0][i], outputStorage[1][i]);
+      filterbankOutputL += outputStorage[0][i];
+      filterbankOutputR += outputStorage[1][i];
+    }
     *out1 = filterbankOutputL;
     *out2 = filterbankOutputR;
     
     //send average to FFT class
-    audioAverage = (filterbankOutputL + filterbankOutputR) * 0.5;
+    audioAverage = (*out1 + *out2) * 0.5;
     //audioAverage = (*out1 + *out2) * 0.5;
     sFFT->SendInput(audioAverage);
   }
@@ -206,15 +185,15 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
         // visualize audio in realtime
         gFFTlyzer->SendFFT(sFFT->GetOutput(c), c, sr);
         // calculate matching curve
-        matchingVector[c] = mAmount * (targetVector[c] - averageVector[c]) + offSet;
+        matchingVector.at(c) = mAmount * (targetVector.at(c) - averageVector.at(c)) + offSet;
         //matchingVector[c] = 0.0707;
         // draw matching curve at highest value of the source
-        matchingCurve->SendFFT(matchingVector[c], c, sr);
+        matchingCurve->SendFFT(matchingVector.at(c), c, sr);
       }
       // reset
       row = 0;
       denominator = 0.;
-    }
+    } // nothing selected
     
     // start / stop source
     if (mSwitch) {
@@ -257,7 +236,7 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
           matrix[row][c] = sFFT->GetOutput(c);
         }
       }
-    }
+    } // start / stop source
     
     // start / stop target
     if (mSwitchb) {
@@ -296,7 +275,7 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
           matrix[row][c] = sFFT->GetOutput(c);
         }
       }
-    }
+    } // start / stop target
   }
 }
 
@@ -304,16 +283,6 @@ void MultibandMatchEQ::Reset()
 {
   TRACE;
   IMutexLock lock(this);
-  bandPass25.initialize();
-  bandPass50.initialize();
-  bandPass100.initialize();
-  bandPass200.initialize();
-  bandPass400.initialize();
-  bandPass800.initialize();
-  bandPass1600.initialize();
-  bandPass3200.initialize();
-  bandPass6400.initialize();
-  bandPass12800.initialize();
 }
 
 void MultibandMatchEQ::OnParamChange(int paramIdx)
