@@ -104,11 +104,17 @@ private:
   double deOctGained = 0.;
   double filterbankOutputL = 0.;
   double filterbankOutputR = 0.;
+  double tempSum = 0.;
+  double tempDenominator = 0.;
+  double tempAverage = 0.;
+  double tempGain = 1.;
+  int tempLowIndex, tempHighIndex;
   
   int octaves, avgPerOctave;
   float averages;
   float bandWidth = (2. / fftSize) * (GetSampleRate() / 2.);
   float centerfrequency = 0.;
+  double bandGain = 1.;
 };
 
 #endif

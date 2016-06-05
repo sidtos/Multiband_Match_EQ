@@ -3,6 +3,7 @@
 #include "IControl.h"
 #include "resource.h"
 #include <vector>
+#include <numeric>
 
 const int kNumPrograms = 1;
 
@@ -134,9 +135,17 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
   double* out1 = outputs[0];
   double* out2 = outputs[1];
   
+  // calculates the number of bands
   LogAverages(22, 3);
+  // vector of filters
   std::vector<Bandpass> filterBank(averages, Bandpass());
+  // stores the output of each filter
   std::vector<std::vector<double> > outputStorage(2, std::vector<double>(averages, 0.));
+  // stores the low and the high index of each filter
+  std::vector<std::vector<double> > indexStorage(2, std::vector<double>(averages, 0.));
+  // stores the gain value that must be applied to match the 2 signals
+  std::vector<double> gainStorage(averages, 1.);
+  
   for (int i = 0; i < averages; i++) {
     centerfrequency = GetAverageCenterFrequency(i);
     //std::cout << centerfrequency << std::endl;
@@ -147,31 +156,12 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
     //std::cout << "High frequency of band " << i+1 << " in Hz: " << highFreq << std::endl;
     double qValue = centerfrequency/(highFreq - lowFreq);
     //std::cout << "Q of band " << i+1 << " is: " << highFreq << std::endl;
-    int xl = FrequencyToIndex(lowFreq);
+    indexStorage[0][i] = FrequencyToIndex(lowFreq);
     //std::cout << "Band " << i+1 << " low frequency index: " << xl << std::endl;
-    int xr = FrequencyToIndex(highFreq);
+    indexStorage[1][i] = FrequencyToIndex(highFreq);
     //std::cout << "Band " << i+1 << " high frequency index: " << xr << std::endl;
     filterBank[i] = Bandpass(qValue, centerfrequency);
     //std::cout << "Band " << i+1 << " size: " << filterBank.size() << std::endl;
-  }
-  
-  for (int s = 0; s < nFrames; ++s, ++in1, ++in2, ++out1, ++out2) {
-    for (int i = 0; i < averages; i++) {
-      if (i == 0) {
-        filterbankOutputL = 0.;
-        filterbankOutputR = 0.;
-      }
-      filterBank[i].processSamples(*in1, *in2, outputStorage[0][i], outputStorage[1][i]);
-      filterbankOutputL += outputStorage[0][i];
-      filterbankOutputR += outputStorage[1][i];
-    }
-    *out1 = filterbankOutputL;
-    *out2 = filterbankOutputR;
-    
-    //send average to FFT class
-    audioAverage = (*out1 + *out2) * 0.5;
-    //audioAverage = (*out1 + *out2) * 0.5;
-    sFFT->SendInput(audioAverage);
   }
   
   if (GetGUI()) {
@@ -185,14 +175,27 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
         // visualize audio in realtime
         gFFTlyzer->SendFFT(sFFT->GetOutput(c), c, sr);
         // calculate matching curve
-        matchingVector.at(c) = mAmount * (targetVector.at(c) - averageVector.at(c)) + offSet;
-        //matchingVector[c] = 0.0707;
+        matchingVector[c] = mAmount * (targetVector[c] - averageVector[c]) + offSet;
         // draw matching curve at highest value of the source
-        matchingCurve->SendFFT(matchingVector.at(c), c, sr);
+        matchingCurve->SendFFT(matchingVector[c], c, sr);
       }
       // reset
       row = 0;
       denominator = 0.;
+      for (int i = 0; i < averages; i++) {
+        tempSum = tempDenominator = tempAverage = 0.;
+        tempGain = 1.;
+        tempLowIndex = indexStorage[0][i];
+        tempHighIndex = indexStorage[1][i];
+        for (int k = tempLowIndex; k <= tempHighIndex; k++) {
+          tempSum += mAmount * (targetVector[k] - averageVector[k]);
+          tempDenominator++;
+          tempAverage = tempSum / tempDenominator;
+        }
+        gainStorage[i] = DBToAmp(tempAverage);
+        std::cout << gainStorage[i] << std::endl;
+      }
+      
     } // nothing selected
     
     // start / stop source
@@ -276,6 +279,28 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
         }
       }
     } // start / stop target
+    
+    // audio output calculation
+    for (int s = 0; s < nFrames; ++s, ++in1, ++in2, ++out1, ++out2) {
+      for (int i = 0; i < averages; i++) {
+        if (i == 0) {
+          filterbankOutputL = 0.;
+          filterbankOutputR = 0.;
+        }
+        filterBank[i].processSamples(*in1, *in2, outputStorage[0][i], outputStorage[1][i]);
+        bandGain = gainStorage[i];
+        filterbankOutputL += outputStorage[0][i] * bandGain;
+        filterbankOutputR += outputStorage[1][i] * bandGain;
+      }
+      *out1 = filterbankOutputL;
+      *out2 = filterbankOutputR;
+      
+      //send average to FFT class
+      audioAverage = (*out1 + *out2) * 0.5;
+      //audioAverage = (*out1 + *out2) * 0.5;
+      sFFT->SendInput(audioAverage);
+    } // audio output calculation
+
   }
 }
 
