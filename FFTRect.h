@@ -280,23 +280,35 @@ class gFFTAnalyzer : public IControl
                 y = RangeConvert(BOUNDED(dbv, dBFloor, 0.), 0., (double)mRECT.T, dBFloor, (double)mRECT.B);
                 double pdv = AmpToDB(iPeak[b] * gainO);
                 yPeak = RangeConvert(BOUNDED(pdv, dBFloor, 0.), 0., (double)mRECT.T, dBFloor, (double)mRECT.B);
+                
+                if (spectType == 1) {
+                    if (!line) pGraphics->DrawVerticalLine(&mColor2, x, mRECT.B, y);
+                } else if (spectType == 0) {
+                    if (b == 0) yPeak = yPrevPeak = y;
+                    
+                    pGraphics->DrawLine(&mColor, xPrev, yPrevPeak, x, yPeak);
+                    xPrev = x;
+                    yPrev = y;
+                    yPrevPeak = yPeak;
+                }
 
                 //filled spectrum
-                //if (!line) pGraphics->DrawVerticalLine(&mColor2, x, mRECT.B, y);
+                /*if (!line) pGraphics->DrawVerticalLine(&mColor2, x, mRECT.B, y);
 
                 if (b == 0) yPeak = yPrevPeak = y;
 
                 pGraphics->DrawLine(&mColor, xPrev, yPrevPeak, x, yPeak);
                     xPrev = x;
                     yPrev = y;
-                    yPrevPeak = yPeak;
+                    yPrevPeak = yPeak;*/
                 }
             return true;
             }
         
-        void SetColors(IColor fill, IColor peakLine) {
+        void SetColors(IColor fill, IColor peakLine, int guiType) {
             mColor = peakLine;
             mColor2 = fill;
+            spectType = guiType;
         }
 
         bool IsDirty() { return true;}
@@ -322,6 +334,7 @@ class gFFTAnalyzer : public IControl
         int i, width;
         double decayValue, peakdecayValue;
         IColor mColor, mColor2;
+        int spectType;
         bool line;
         double minFreq, maxFreq;
         double dBFloor, ampFloor;

@@ -32,20 +32,20 @@ enum ELayout
   kWidth = GUI_WIDTH,
   kHeight = GUI_HEIGHT,
   
-  kGainX = 20,
-  kGainY = 20,
-  kISwitchControl_2_X = 20,
-  kISwitchControl_2_Y = 80,
+  kGainX = 14,
+  kGainY = 40,
+  kISwitchControl_2_X = 28,
+  kISwitchControl_2_Y = 138,
   kISwitchControl_2_N = 2,
-  kISwitchControl_2b_X = 20,
-  kISwitchControl_2b_Y = 150,
+  kISwitchControl_2b_X = 28,
+  kISwitchControl_2b_Y = 222,
   kISwitchControl_2b_N = 2,
-  kAmountX = 20,
-  kAmountY = 210,
-  kAmount2X = 20,
-  kAmount2Y = 270,
-  kAmount3X = 20,
-  kAmount3Y = 330,
+  kAmountX = 14,
+  kAmountY = 318,
+  kAmount2X = 14,
+  kAmount2Y = 412,
+  kAmount3X = 14,
+  kAmount3Y = 506,
   kKnobFrames = 60
 };
 
@@ -67,7 +67,8 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   GetParam(kAmount3)->SetShape(2.);
   
   IGraphics* pGraphics = MakeGraphics(this, kWidth, kHeight);
-  pGraphics->AttachPanelBackground(&COLOR_BLACK);
+  //pGraphics->AttachPanelBackground(&COLOR_BLACK);
+  pGraphics->AttachBackground(BG_ID, BG_FN);
   
   IBitmap knob = pGraphics->LoadIBitmap(KNOB_ID, KNOB_FN, kKnobFrames);
   IBitmap bitmap = pGraphics->LoadIBitmap(ISWITCHCONTROL_2_ID, ISWITCHCONTROL_2_FN, kISwitchControl_2_N);
@@ -95,10 +96,10 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   sourceSpectrum->SetdbFloor(-60.);
   targetSpectrum->SetdbFloor(-60.);
   matchingCurve->SetdbFloor(-60.);
-  gFFTlyzer->SetColors(COLOR_GRAY, COLOR_WHITE);
-  sourceSpectrum->SetColors(COLOR_GRAY, COLOR_RED);
-  targetSpectrum->SetColors(COLOR_GRAY, COLOR_BLUE);
-  matchingCurve->SetColors(COLOR_GRAY, COLOR_GRAY);
+  gFFTlyzer->SetColors(COLOR_GRAY, COLOR_GRAY, 1);
+  sourceSpectrum->SetColors(COLOR_BLACK, COLOR_BLACK, 0);
+  targetSpectrum->SetColors(COLOR_GRAY, COLOR_WHITE, 0);
+  matchingCurve->SetColors(COLOR_GRAY, COLOR_YELLOW, 0);
   
 #ifdef OS_OSX
   char* fontName = "Futura";
@@ -200,7 +201,6 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
           // matching band 3: 181 - 2049
           matchingVector[c] = mAmount3 * (targetVector[c] - averageVector[c]);
         }
-        //matchingVector[c] = mAmount * (targetVector[c] - averageVector[c]);
         // draw matching curve at highest value of the source
         matchingCurve->SendFFT((matchingVector[c] + offSet), c, sr);
       }
