@@ -100,7 +100,7 @@ Next steps:
 
 ---
 
-05.06.2016
+##05.06.2016
 
 The bandpass filters are now created dynamically by giving them the bandwidth and the
 centerfrequency as parameters. After that, the filters are stored in a vector of objects.
