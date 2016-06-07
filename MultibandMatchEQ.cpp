@@ -9,8 +9,11 @@ const int kNumPrograms = 1;
 
 // matrix 250 x 2049
 std::vector<std::vector<double> > matrix(250, std::vector<double>(2049, 0.));
+// source signal average
 std::vector<double> averageVector(2049, 0.);
+// target signal average
 std::vector<double> targetVector(2049, 0.);
+// difference between source and target
 std::vector<double> matchingVector(2049, 0.);
 
 enum EParams
@@ -54,7 +57,7 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   GetParam(kAmount)->SetShape(2.);
   
   IGraphics* pGraphics = MakeGraphics(this, kWidth, kHeight);
-  pGraphics->AttachPanelBackground(&COLOR_WHITE);
+  pGraphics->AttachPanelBackground(&COLOR_BLACK);
   
   IBitmap knob = pGraphics->LoadIBitmap(KNOB_ID, KNOB_FN, kKnobFrames);
   IBitmap bitmap = pGraphics->LoadIBitmap(ISWITCHCONTROL_2_ID, ISWITCHCONTROL_2_FN, kISwitchControl_2_N);
@@ -80,10 +83,10 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   sourceSpectrum->SetdbFloor(-60.);
   targetSpectrum->SetdbFloor(-60.);
   matchingCurve->SetdbFloor(-60.);
-  gFFTlyzer->SetColors(COLOR_GRAY, COLOR_BLACK);
+  gFFTlyzer->SetColors(COLOR_GRAY, COLOR_WHITE);
   sourceSpectrum->SetColors(COLOR_GRAY, COLOR_RED);
   targetSpectrum->SetColors(COLOR_GRAY, COLOR_BLUE);
-  matchingCurve->SetColors(COLOR_GRAY, COLOR_GREEN);
+  matchingCurve->SetColors(COLOR_GRAY, COLOR_GRAY);
   
 #ifdef OS_OSX
   char* fontName = "Futura";
@@ -93,9 +96,9 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   IText::EQuality texttype = IText::EQuality::kQualityClearType;
   
 #endif
-  IText lFont(12, &COLOR_BLACK, fontName, IText::kStyleNormal, IText::kAlignCenter, 0, texttype);
+  IText lFont(12, &COLOR_GRAY, fontName, IText::kStyleNormal, IText::kAlignCenter, 0, texttype);
   // adding the vertical frequency lines
-  gFFTFreqLines = new gFFTFreqDraw(this, iView, COLOR_BLACK, &lFont);
+  gFFTFreqLines = new gFFTFreqDraw(this, iView, COLOR_GRAY, &lFont);
   pGraphics->AttachControl(gFFTFreqLines);
   
   //setting the min/max freq for fft display and freq lines
@@ -111,9 +114,9 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   gFFTFreqLines->SetMinFreq(minF);
   
   //setting +3dB/octave compensation to the fft display
-  gFFTlyzer->SetOctaveGain(3., true);
-  sourceSpectrum->SetOctaveGain(3., true);
-  targetSpectrum->SetOctaveGain(3., true);
+  gFFTlyzer->SetOctaveGain(0., true);
+  sourceSpectrum->SetOctaveGain(0., true);
+  targetSpectrum->SetOctaveGain(0., true);
   matchingCurve->SetOctaveGain(0., true);
   
   AttachGraphics(pGraphics);
@@ -136,6 +139,7 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
   double* out2 = outputs[1];
   
   // calculates the number of bands
+  //LogAverages(22, 3);
   LogAverages(22, 3);
   // vector of filters
   std::vector<Bandpass> filterBank(averages, Bandpass());
@@ -188,12 +192,15 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
         tempLowIndex = indexStorage[0][i];
         tempHighIndex = indexStorage[1][i];
         for (int k = tempLowIndex; k <= tempHighIndex; k++) {
-          tempSum += mAmount * (targetVector[k] - averageVector[k]);
+          tempSum += (mAmount * 135) * (targetVector[k] - averageVector[k]);
           tempDenominator++;
           tempAverage = tempSum / tempDenominator;
         }
-        gainStorage[i] = DBToAmp(tempAverage);
-        std::cout << gainStorage[i] << std::endl;
+        /*if (tempAverage < 0.) {
+          tempAverage = 0.;
+        }*/
+        gainStorage[i] = 1. + tempAverage;
+        //std::cout << gainStorage[i] << std::endl;
       }
       
     } // nothing selected
@@ -292,6 +299,7 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
         filterbankOutputL += outputStorage[0][i] * bandGain;
         filterbankOutputR += outputStorage[1][i] * bandGain;
       }
+      //filterBank[6].processSamples(*in1, *in2, filterbankOutputL, filterbankOutputR);
       *out1 = filterbankOutputL;
       *out2 = filterbankOutputR;
       
