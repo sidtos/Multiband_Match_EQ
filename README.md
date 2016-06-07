@@ -93,7 +93,21 @@ of their FFT class. After implementing these functions I am able to calculate th
 corresponding index of each frequency. Furthermore, I now split the FFT in 10 octaves,
 each divided by 3, resulting in a total of 30 bands.
 
-Next step: 
+Next steps: 
 - link a bandpass filter to the centerfrequency of each band
 - calculate the bandwith of the filter using the precalculated values for the low and the
   high frequencies
+
+---
+
+05.06.2016
+
+The bandpass filters are now created dynamically by giving them the bandwidth and the
+centerfrequency as parameters. After that, the filters are stored in a vector of objects.
+Furthermore, I calculate the average gain per band and store these values in a vector
+as well. In the output loop I multiply the "gain per band" values with the corresponding
+filter.
+
+Next steps:
+- the matching amount can't be adjusted per band yet, as stated in the title
+- custom GUI

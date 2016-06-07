@@ -1,7 +1,7 @@
-#Logbook
+Logbook
 ———
 
-##21.05.2016
+21.05.2016
 
 The development of the plugin can be divided in two parts: FFT calculations and filtering. 
 I chose to begin with the spectral half. The following components are implemented and seem 
@@ -42,7 +42,7 @@ creating the filter has a higher priority for now.
 
 ---
 
-##23.05.2016
+23.05.2016
 
 After explaining my project to Pieter Suurmond I decided to design a x-band filterbank of 
 several bandpass filters. Pieter stated that in "Elements of Computer Music" (page 134) by 
@@ -65,7 +65,7 @@ and create a bandpass filter for each band.
 
 ---
 
-##30.05.2016
+30.05.2016
 
 Several bandpass filters were implemented. Starting at 25 Hz I took twice the value for
 the next bandpass resulting in a total of 10 filters. When testing the response of the
@@ -85,7 +85,7 @@ Number of bands: 10
 
 ---
 
-##04.06.2016
+04.06.2016
 
 The minim library for Processing provides an example where the FFT averages are
 calculated, both linearly and logarithmically. On github I found the source code
@@ -94,7 +94,22 @@ of their FFT class. After implementing these functions I am able to calculate th
 corresponding index of each frequency. Furthermore, I now split the FFT in 10 octaves,
 each divided by 3, resulting in a total of 30 bands.
 
-Next step: 
+Next steps: 
 - link a bandpass filter to the centerfrequency of each band
 - calculate the bandwith of the filter using the precalculated values for the low and the
   high frequencies
+
+---
+
+05.06.2016
+
+The bandpass filters are now created dynamically by giving them the bandwidth and the
+centerfrequency as parameters. After that, the filters are stored in a vector of objects.
+Furthermore, I calculate the average gain per band and store these values in a vector
+as well. In the output loop I multiply the "gain per band" values with the corresponding
+filter.
+
+Next steps:
+- the matching amount can't be adjusted per band yet, as stated in the title
+- custom GUI
+
