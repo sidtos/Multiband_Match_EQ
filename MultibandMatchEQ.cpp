@@ -22,6 +22,8 @@ enum EParams
   kISwitchControl_2,
   kISwitchControl_2b,
   kAmount,
+  kAmount2,
+  kAmount3,
   kNumParams
 };
 
@@ -40,6 +42,10 @@ enum ELayout
   kISwitchControl_2b_N = 2,
   kAmountX = 20,
   kAmountY = 210,
+  kAmount2X = 20,
+  kAmount2Y = 270,
+  kAmount3X = 20,
+  kAmount3Y = 330,
   kKnobFrames = 60
 };
 
@@ -55,6 +61,10 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   GetParam(kISwitchControl_2b)->InitBool("ISwitchControl 2 image multi", 0, "images");
   GetParam(kAmount)->InitDouble("Amount", 0., 0.001, 1., 0.001, "%");
   GetParam(kAmount)->SetShape(2.);
+  GetParam(kAmount2)->InitDouble("Amount2", 0., 0.001, 1., 0.001, "%");
+  GetParam(kAmount2)->SetShape(2.);
+  GetParam(kAmount3)->InitDouble("Amount3", 0., 0.001, 1., 0.001, "%");
+  GetParam(kAmount3)->SetShape(2.);
   
   IGraphics* pGraphics = MakeGraphics(this, kWidth, kHeight);
   pGraphics->AttachPanelBackground(&COLOR_BLACK);
@@ -66,6 +76,8 @@ MultibandMatchEQ::MultibandMatchEQ(IPlugInstanceInfo instanceInfo)
   pGraphics->AttachControl(new ISwitchControl(this, kISwitchControl_2_X, kISwitchControl_2_Y, kISwitchControl_2, &bitmap));
   pGraphics->AttachControl(new ISwitchControl(this, kISwitchControl_2b_X, kISwitchControl_2b_Y, kISwitchControl_2b, &bitmap));
   pGraphics->AttachControl(new IKnobMultiControl(this, kAmountX, kAmountY, kAmount, &knob));
+  pGraphics->AttachControl(new IKnobMultiControl(this, kAmount2X, kAmount2Y, kAmount2, &knob));
+  pGraphics->AttachControl(new IKnobMultiControl(this, kAmount3X, kAmount3Y, kAmount3, &knob));
   
   // IRECT for graphical display
   // (mRECT.L, mRECT.T, .,mRECT.B)
@@ -139,7 +151,6 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
   double* out2 = outputs[1];
   
   // calculates the number of bands
-  //LogAverages(22, 3);
   LogAverages(22, 3);
   // vector of filters
   std::vector<Bandpass> filterBank(averages, Bandpass());
@@ -179,9 +190,19 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
         // visualize audio in realtime
         gFFTlyzer->SendFFT(sFFT->GetOutput(c), c, sr);
         // calculate matching curve
-        matchingVector[c] = mAmount * (targetVector[c] - averageVector[c]) + offSet;
+        if (c <= 17) {
+          // matching band 1: 0-17
+          matchingVector[c] = mAmount * (targetVector[c] - averageVector[c]);
+        } else if (c <= 180) {
+          // matching band 2: 18-180
+          matchingVector[c] = mAmount2 * (targetVector[c] - averageVector[c]);
+        } else {
+          // matching band 3: 181 - 2049
+          matchingVector[c] = mAmount3 * (targetVector[c] - averageVector[c]);
+        }
+        //matchingVector[c] = mAmount * (targetVector[c] - averageVector[c]);
         // draw matching curve at highest value of the source
-        matchingCurve->SendFFT(matchingVector[c], c, sr);
+        matchingCurve->SendFFT((matchingVector[c] + offSet), c, sr);
       }
       // reset
       row = 0;
@@ -192,15 +213,15 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
         tempLowIndex = indexStorage[0][i];
         tempHighIndex = indexStorage[1][i];
         for (int k = tempLowIndex; k <= tempHighIndex; k++) {
-          tempSum += (mAmount * 135) * (targetVector[k] - averageVector[k]);
+          tempSum += 135 * matchingVector[k];
           tempDenominator++;
           tempAverage = tempSum / tempDenominator;
         }
-        /*if (tempAverage < 0.) {
-          tempAverage = 0.;
-        }*/
+        // avoid negative gain values
+        if (tempAverage < -1.) {
+          tempAverage = -1.;
+        }
         gainStorage[i] = 1. + tempAverage;
-        //std::cout << gainStorage[i] << std::endl;
       }
       
     } // nothing selected
@@ -299,9 +320,8 @@ void MultibandMatchEQ::ProcessDoubleReplacing(double** inputs, double** outputs,
         filterbankOutputL += outputStorage[0][i] * bandGain;
         filterbankOutputR += outputStorage[1][i] * bandGain;
       }
-      //filterBank[6].processSamples(*in1, *in2, filterbankOutputL, filterbankOutputR);
-      *out1 = filterbankOutputL;
-      *out2 = filterbankOutputR;
+      *out1 = filterbankOutputL * mGain;
+      *out2 = filterbankOutputR * mGain;
       
       //send average to FFT class
       audioAverage = (*out1 + *out2) * 0.5;
@@ -338,6 +358,14 @@ void MultibandMatchEQ::OnParamChange(int paramIdx)
       
     case kAmount:
       mAmount = GetParam(kAmount)->Value();
+      break;
+      
+    case kAmount2:
+      mAmount2 = GetParam(kAmount2)->Value();
+      break;
+      
+    case kAmount3:
+      mAmount3 = GetParam(kAmount3)->Value();
       break;
       
     default:
