@@ -1,5 +1,7 @@
 #Multiband Match EQ
 
+The Multiband Match EQ is a multiplatform audioplugin written in c++. It basically contains a filterbank that automatically adapts to the frequency spectrum of stored signals. A more visual presentation can be found on my website: http://studenthome.hku.nl/~sid.tossenberger/portfolio/multiband-match-eq/
+
 ##Logbook
 
 **21.05.2016**
