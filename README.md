@@ -113,5 +113,18 @@ as well. In the output loop I multiply the "gain per band" values with the corre
 filter.
 
 Next steps:
-- the matching amount can't be adjusted per band yet, as stated in the title
-- custom GUI
+* the matching amount can't be adjusted per band yet, as stated in the title
+* custom GUI
+
+---
+
+**05.06.2016**
+
+The possibility to seperately adjust the EQ for low, mid and high frequencies is now implemented. Moreover, I did the design for the Graphical User Interface which covers knobs, toggles and background images. 
+
+Besides that, I focussed on completing the documentation of the process of developing this plugin. I added comments to the source code and built a subpage on my website.
+
+##Future Improvements
+
+* storing spectrums as presets
+* automatically adjusting master gain
