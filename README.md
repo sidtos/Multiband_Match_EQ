@@ -1,6 +1,8 @@
-#Logbook
+#Multiband Match EQ
 
-##21.05.2016
+##Logbook
+
+###21.05.2016
 
 The development of the plugin can be divided in two parts: FFT calculations and filtering. 
 I chose to begin with the spectral half. The following components are implemented and seem 
@@ -41,7 +43,7 @@ creating the filter has a higher priority for now.
 
 ---
 
-##23.05.2016
+###23.05.2016
 
 After explaining my project to Pieter Suurmond I decided to design a x-band filterbank of 
 several bandpass filters. Pieter stated that in "Elements of Computer Music" (page 134) by 
@@ -64,7 +66,7 @@ and create a bandpass filter for each band.
 
 ---
 
-##30.05.2016
+###30.05.2016
 
 Several bandpass filters were implemented. Starting at 25 Hz I took twice the value for
 the next bandpass resulting in a total of 10 filters. When testing the response of the
@@ -84,7 +86,7 @@ Notes:
 
 ---
 
-##04.06.2016
+###04.06.2016
 
 The minim library for Processing provides an example where the FFT averages are
 calculated, both linearly and logarithmically. On github I found the source code
@@ -100,7 +102,7 @@ Next steps:
 
 ---
 
-##05.06.2016
+###05.06.2016
 
 The bandpass filters are now created dynamically by giving them the bandwidth and the
 centerfrequency as parameters. After that, the filters are stored in a vector of objects.
