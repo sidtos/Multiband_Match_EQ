@@ -2,6 +2,21 @@
 
 The Multiband Match EQ is a multiplatform audioplugin written in c++. It basically contains a filterbank that automatically adapts to the frequency spectrum of stored signals. A more visual presentation can be found on my website: http://studenthome.hku.nl/~sid.tossenberger/portfolio/multiband-match-eq/
 
+This repository contains the source code:
+* MultibandMatchEQ.cpp
+* MultibandMatchEQ.h
+* bandpass.cpp
+* bandpass.h
+* FFTRect.h (FFT class I used for the analyzer)
+
+and documentation files:
+* README.md
+* eerste_idee.txt
+* logbook.txt
+* systeemontwerp.pdf
+
+The full documentation can be found in this readme file for better readability.
+
 ##Concept
 
 The goal is to code a plugin similar to *iZotope's Matching EQ*, *Fabfilter's EQ Match*, *Logic's Match EQ* and *TBPro Audio's Euphonia*. However, all these plugins do not let the user adjust the amount of matching per band (low, mid and high frequencies).
