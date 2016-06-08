@@ -43,7 +43,6 @@ Note:
 If there's time left at the end of the project I will implement the solution. However, 
 creating the filter has a higher priority for now.
 
----
 
 **23.05.2016**
 
@@ -66,7 +65,6 @@ The next step would be to split the spectrum in a number of bands (possibly as s
 http://stackoverflow.com/questions/10349597/2nd-order-iir-filter-coefficients-for-a-butterworth-bandpass-eq)
 and create a bandpass filter for each band.
 
----
 
 **30.05.2016**
 
@@ -86,7 +84,6 @@ Notes:
 - Vectorsize: 2049
 - Number of bands: 10
 
----
 
 **04.06.2016**
 
@@ -102,7 +99,6 @@ Next steps:
 - calculate the bandwith of the filter using the precalculated values for the low and the
   high frequencies
 
----
 
 **05.06.2016**
 
@@ -116,13 +112,13 @@ Next steps:
 * the matching amount can't be adjusted per band yet, as stated in the title
 * custom GUI
 
----
 
 **05.06.2016**
 
 The possibility to seperately adjust the EQ for low, mid and high frequencies is now implemented. Moreover, I did the design for the Graphical User Interface which covers knobs, toggles and background images. 
 
 Besides that, I focussed on completing the documentation of the process of developing this plugin. I added comments to the source code and built a subpage on my website.
+
 
 ##Future Improvements
 
