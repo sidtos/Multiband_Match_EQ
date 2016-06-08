@@ -66,7 +66,7 @@ and create a bandpass filter for each band.
 
 ---
 
-###30.05.2016
+**30.05.2016**
 
 Several bandpass filters were implemented. Starting at 25 Hz I took twice the value for
 the next bandpass resulting in a total of 10 filters. When testing the response of the
