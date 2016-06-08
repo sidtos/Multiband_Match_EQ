@@ -2,6 +2,15 @@
 
 The Multiband Match EQ is a multiplatform audioplugin written in c++. It basically contains a filterbank that automatically adapts to the frequency spectrum of stored signals. A more visual presentation can be found on my website: http://studenthome.hku.nl/~sid.tossenberger/portfolio/multiband-match-eq/
 
+##Planning
+
+Since this is an assignment for school I have a total of 7 weeks to develop the first version of the plugin. The planning I did on day one looks as follows:
+
+[x] 3 weeks: analyzer
+[x] 2 weeks: filterbank
+[x] 1 week: combining analyzer and filterbank
+[x] 1 week: GUI
+
 ##Logbook
 
 **21.05.2016**
@@ -43,7 +52,6 @@ Note:
 If there's time left at the end of the project I will implement the solution. However, 
 creating the filter has a higher priority for now.
 
-
 **23.05.2016**
 
 After explaining my project to Pieter Suurmond I decided to design a x-band filterbank of 
@@ -65,7 +73,6 @@ The next step would be to split the spectrum in a number of bands (possibly as s
 http://stackoverflow.com/questions/10349597/2nd-order-iir-filter-coefficients-for-a-butterworth-bandpass-eq)
 and create a bandpass filter for each band.
 
-
 **30.05.2016**
 
 Several bandpass filters were implemented. Starting at 25 Hz I took twice the value for
@@ -84,7 +91,6 @@ Notes:
 - Vectorsize: 2049
 - Number of bands: 10
 
-
 **04.06.2016**
 
 The minim library for Processing provides an example where the FFT averages are
@@ -99,7 +105,6 @@ Next steps:
 - calculate the bandwith of the filter using the precalculated values for the low and the
   high frequencies
 
-
 **05.06.2016**
 
 The bandpass filters are now created dynamically by giving them the bandwidth and the
@@ -112,13 +117,11 @@ Next steps:
 * the matching amount can't be adjusted per band yet, as stated in the title
 * custom GUI
 
-
 **05.06.2016**
 
 The possibility to seperately adjust the EQ for low, mid and high frequencies is now implemented. Moreover, I did the design for the Graphical User Interface which covers knobs, toggles and background images. 
 
 Besides that, I focussed on completing the documentation of the process of developing this plugin. I added comments to the source code and built a subpage on my website.
-
 
 ##Future Improvements
 
