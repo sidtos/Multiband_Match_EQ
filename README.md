@@ -6,10 +6,10 @@ The Multiband Match EQ is a multiplatform audioplugin written in c++. It basical
 
 Since this is an assignment for school I have a total of 7 weeks to develop the first version of the plugin. The planning I did on day one looks as follows:
 
-[x] 3 weeks: analyzer
-[x] 2 weeks: filterbank
-[x] 1 week: combining analyzer and filterbank
-[x] 1 week: GUI
+- [x] 3 weeks: analyzer
+- [x] 2 weeks: filterbank
+- [x] 1 week: combining analyzer and filterbank
+- [x] 1 week: GUI
 
 ##Logbook
 
