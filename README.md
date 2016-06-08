@@ -4,7 +4,9 @@ The Multiband Match EQ is a multiplatform audioplugin written in c++. It basical
 
 ##Concept
 
-The goal is to code a matching EQ similar to *iZotope's Matching EQ*, *Fabfilter's EQ Match*, *Logic's Match EQ* and *TBPro Audio's Euphonia*. However, all these plugins do not let the user adjust the amount of matching per band (low, mid and high frequencies).
+The goal is to code a plugin similar to *iZotope's Matching EQ*, *Fabfilter's EQ Match*, *Logic's Match EQ* and *TBPro Audio's Euphonia*. However, all these plugins do not let the user adjust the amount of matching per band (low, mid and high frequencies).
+
+After doing some research on how the listed plugins work I decided to split the development into 2 main fragments: the analyzer and the equalizer. Once the analyzer is working I am able to store the data in vectors and calculate the curve of the EQ.
 
 ##Planning
 
@@ -131,3 +133,4 @@ Besides that, I focussed on completing the documentation of the process of devel
 
 * storing spectrums as presets
 * automatically adjusting master gain
+* a better sounding filterbank (especially in the high frequency band)
